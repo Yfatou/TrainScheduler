@@ -17,7 +17,7 @@ var config = {
   var trainName = "";
   var destination = "";
   var frequency = 0;
-  var firstTrainTime = "";
+  var firstTrainTime ;
 
  //Global variables
  //var trainName1  ;
@@ -34,10 +34,15 @@ var config = {
       frequency = $("#inputFrequency").val().trim();
       firstTrainTime = $("#inputFirstTrainTime").val().trim();
       
-      console.log(trainName + "test");
+      console.log(trainName);
       console.log(destination);
       console.log(frequency);
       console.log(firstTrainTime);
+
+      $("#inputTrainName").empty();
+      $("#inputDestination").empty();
+      $("#inputFirstTrainTime").empty();
+      $("#inputFrequency").empty();
 
 
       database.ref().push({//and insert them in the database
@@ -49,20 +54,57 @@ var config = {
       });
   });
 
-
+  //This function is retrieving the data inserted by the user in firebase
   database.ref().on("child_added", function(childSnapshot){
-
+    //We're putting the retrieved datas in variables
     var pushTrainName = childSnapshot.val().trainName;
     var pushDestination = childSnapshot.val().destination;
     var pushFrequency = childSnapshot.val().frequency;
+    var pushFirstTrainTime = childSnapshot.val().firstTrainTime;
 
     console.log(childSnapshot.val().trainName);
     console.log(childSnapshot.val().destination);
     console.log(childSnapshot.val().frequency);
     console.log(childSnapshot.val().firstTrainTime);
 
-    $(".train-table").append("<tr> <td>" + pushTrainName + "</td><td>" + pushDestination + "</td><td>" + pushFrequency + "</td></tr>");
-    empty();
+    //The lines of code below will calculate the next arrival train and the number of minutes away
+    //relative to the current time
+    
+
+    //The formula used is the following
+    //Current minute - 00 = difference time
+    //difference time  modulo frequency = time appart
+    //frencency - time appart = minutes away
+    //minutes away + current time = next arrival
+
+    //current Time
+    var currentTime = moment();
+    console.log("CURRENT TIME: " + moment(currentTime).format("HH:mm"));
+
+    //Convert the first train time
+    var firstTrainTimeConverted = moment(pushFirstTrainTime, "HH:mm").subtract(1, "years");
+    console.log("first train time: " + pushFirstTrainTime);
+    console.log("time converted: " + firstTrainTimeConverted);  
+    
+
+    //Difference between the times (????)
+    var diffTime = moment().diff(moment(firstTrainTimeConverted), "minutes");
+    console.log("DIFFERENCE IN TIME: " + diffTime);
+
+    //Time appart
+    var timeAppart = diffTime % frequency;
+    console.log(timeAppart);
+
+    //Minutes away
+    var minutesAway = frequency - timeAppart;
+    console.log()
+
+    //Next train
+    var nextArrival = moment().add(minutesAway, "minutes");
+
+    //Then we display the data on our HTML page
+    $(".train-table").append("<tr> <td>" + pushTrainName + "</td><td>" + pushDestination + "</td><td>" + pushFrequency + "</td><td>" + nextArrival + "</td><td>" + minutesAway + "</td></tr>");
+    //empty();
 
   }, function(errorObject){
 
@@ -70,15 +112,18 @@ var config = {
 
   });
 
-  //function that empty the input boxes after insert
-  function empty(){
-      $("#inputTrainName").empty();
-      $("#inputDestination").empty();
-      $("#inputFirstTrainTime").empty();
-      $("#inputFrequency").empty();
-  }
+//function that empty the input boxes after insert
+//   function empty(){
+//       $("#inputTrainName").empty();
+//       $("#inputDestination").empty();
+//       $("#inputFirstTrainTime").empty();
+//       $("#inputFrequency").empty();
+//   }
 
-      
+
+
+    
+
 
    
   

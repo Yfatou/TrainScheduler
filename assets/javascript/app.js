@@ -34,12 +34,6 @@ var config = {
       console.log(frequency);
       console.log(firstTrainTime);
 
-      //Empty the input boxes
-      $("#inputTrainName").empty();
-      $("#inputDestination").empty();
-      $("#inputFirstTrainTime").empty();
-      $("#inputFrequency").empty();
-
       //If the user did not put all the informations
       if(trainName == "" || destination == "" || frequency == "" || firstTrainTime == ""){
           alert("Incomplete informations, the train can't be added");
@@ -52,7 +46,18 @@ var config = {
             firstTrainTime: firstTrainTime,
             //dateAded: firebase.database.ServerValue.TIMESTAMP
         }); 
+
+        emptyInputBoxes();//We clear the inputBoxes
       }
+  });
+
+
+  //on click event to allow the user to cancel 
+  $(".cancel-add").on("click", function(){
+    event.preventDefault();
+
+    emptyInputBoxes();//we clear the input boxes
+
   });
 
   //This function is retrieving the data inserted by the user in firebase
@@ -104,7 +109,7 @@ var config = {
     //Next train
     var nextTrain = moment().add(minutesAway, "minutes");
     var nextArrival = moment(nextTrain).format("hh:mm");
-    console.log("ARRIVAL TIME: " + moment(nextArrival).format("hh:mm"));
+    console.log("ARRIVAL TIME: " + nextArrival);
 
     //Then we display the data on our HTML page
     $(".train-table").append("<tr> <td>" + pushTrainName + "</td><td>" + pushDestination + "</td><td>" + pushFrequency + "</td><td>" + nextArrival + "</td><td>" + minutesAway + "</td></tr>");
@@ -116,8 +121,13 @@ var config = {
 
   });
 
-
-
+  //This function will empty the input boxes after the datas are inserted in firebase
+  function emptyInputBoxes(){
+     $("#inputTrainName").val("");
+     $("#inputDestination").val("");
+     $("#inputFirstTrainTime").val("");
+     $("#inputFrequency").val("");
+  }
 
     
 

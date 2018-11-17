@@ -19,11 +19,6 @@ var config = {
   var frequency = 0;
   var firstTrainTime ;
 
- //Global variables
- //var trainName1  ;
- //var destination1  ;
- //var frequency1 ;
- //var firstTrainTime1 ;
 
   //on click event for when the user click on the button to add a new train
   $(".add-Train").on("click", function(){
@@ -39,19 +34,25 @@ var config = {
       console.log(frequency);
       console.log(firstTrainTime);
 
+      //Empty the input boxes
       $("#inputTrainName").empty();
       $("#inputDestination").empty();
       $("#inputFirstTrainTime").empty();
       $("#inputFrequency").empty();
 
-
-      database.ref().push({//and insert them in the database
-          trainName: trainName,
-          destination: destination,
-          frequency: frequency,
-          firstTrainTime: firstTrainTime,
-          //dateAded: firebase.database.ServerValue.TIMESTAMP
-      });
+      //If the user did not put all the informations
+      if(trainName == "" || destination == "" || frequency == "" || firstTrainTime == ""){
+          alert("Incomplete informations, the train can't be added");
+      } 
+      else {//If all the input boxes, are filled
+        database.ref().push({//and insert them in the database
+            trainName: trainName,
+            destination: destination,
+            frequency: frequency,
+            firstTrainTime: firstTrainTime,
+            //dateAded: firebase.database.ServerValue.TIMESTAMP
+        }); 
+      }
   });
 
   //This function is retrieving the data inserted by the user in firebase
@@ -77,30 +78,33 @@ var config = {
     //frencency - time appart = minutes away
     //minutes away + current time = next arrival
 
-    //current Time
-    var currentTime = moment();
-    console.log("CURRENT TIME: " + moment(currentTime).format("HH:mm"));
 
     //Convert the first train time
     var firstTrainTimeConverted = moment(pushFirstTrainTime, "HH:mm").subtract(1, "years");
     console.log("first train time: " + pushFirstTrainTime);
     console.log("time converted: " + firstTrainTimeConverted);  
     
+    //current Time
+    var currentTime = moment();
+    console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
+    console.log("Current time (nf): " + currentTime);
 
     //Difference between the times (????)
     var diffTime = moment().diff(moment(firstTrainTimeConverted), "minutes");
     console.log("DIFFERENCE IN TIME: " + diffTime);
 
     //Time appart
-    var timeAppart = diffTime % frequency;
-    console.log(timeAppart);
+    var timeAppart = diffTime % pushFrequency;
+    console.log("Time appart: " + timeAppart);
 
     //Minutes away
-    var minutesAway = frequency - timeAppart;
-    console.log()
+    var minutesAway = pushFrequency - timeAppart;
+    console.log("Minutes till train: " + minutesAway);
 
     //Next train
-    var nextArrival = moment().add(minutesAway, "minutes");
+    var nextTrain = moment().add(minutesAway, "minutes");
+    var nextArrival = moment(nextTrain).format("hh:mm");
+    console.log("ARRIVAL TIME: " + moment(nextArrival).format("hh:mm"));
 
     //Then we display the data on our HTML page
     $(".train-table").append("<tr> <td>" + pushTrainName + "</td><td>" + pushDestination + "</td><td>" + pushFrequency + "</td><td>" + nextArrival + "</td><td>" + minutesAway + "</td></tr>");
@@ -112,13 +116,6 @@ var config = {
 
   });
 
-//function that empty the input boxes after insert
-//   function empty(){
-//       $("#inputTrainName").empty();
-//       $("#inputDestination").empty();
-//       $("#inputFirstTrainTime").empty();
-//       $("#inputFrequency").empty();
-//   }
 
 
 

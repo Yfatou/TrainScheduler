@@ -68,11 +68,6 @@ var config = {
     var pushFrequency = childSnapshot.val().frequency;
     var pushFirstTrainTime = childSnapshot.val().firstTrainTime;
 
-    console.log(childSnapshot.val().trainName);
-    console.log(childSnapshot.val().destination);
-    console.log(childSnapshot.val().frequency);
-    console.log(childSnapshot.val().firstTrainTime);
-
     //The lines of code below will calculate the next arrival train and the number of minutes away
     //relative to the current time
     
@@ -86,38 +81,49 @@ var config = {
 
     //Convert the first train time
     var firstTrainTimeConverted = moment(pushFirstTrainTime, "HH:mm").subtract(1, "years");
-    console.log("first train time: " + pushFirstTrainTime);
-    console.log("time converted: " + firstTrainTimeConverted);  
     
     //current Time
     var currentTime = moment();
-    console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
-    console.log("Current time (nf): " + currentTime);
 
     //Difference between the times (????)
     var diffTime = moment().diff(moment(firstTrainTimeConverted), "minutes");
-    console.log("DIFFERENCE IN TIME: " + diffTime);
 
     //Time appart
     var timeAppart = diffTime % pushFrequency;
-    console.log("Time appart: " + timeAppart);
 
     //Minutes away
     var minutesAway = pushFrequency - timeAppart;
-    console.log("Minutes till train: " + minutesAway);
 
     //Next train
     var nextTrain = moment().add(minutesAway, "minutes");
     var nextArrival = moment(nextTrain).format("hh:mm");
-    console.log("ARRIVAL TIME: " + nextArrival);
 
+    
     //Then we display the data on our HTML page
-    $(".train-table").append("<tr> <td>" + pushTrainName + "</td><td>" + pushDestination + "</td><td>" + pushFrequency + "</td><td>" + nextArrival + "</td><td>" + minutesAway + "</td></tr>");
-    //empty();
+    //Adding also a delete button to each row
+    $(".train-table").append("<tr> <td>" + pushTrainName + "</td><td>" + pushDestination + 
+    "</td><td>" + pushFrequency + "</td><td>" + nextArrival + "</td><td>" + minutesAway + 
+    "</td><td>" + '<button class="btn btn-danger deleteBtn">Delete</button>' + "</td></tr>");
 
   }, function(errorObject){
 
     console.log("Errors handled: " + errorObject.code);
+
+  });
+
+  //On click event on the deleteBtn to delete the selected row from firebase
+  $(".deleteBtn").on("click", function(){
+    console.log("on click")
+    var key = Object.keys(snapshot.val())[0];
+    console.log(key);
+  ref.orderByChild().equalTo(key)
+    .once('value').then(function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+        //remove each child
+        ref.child(childSnapshot.key).remove();
+    });
+});
+
 
   });
 

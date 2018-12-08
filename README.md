@@ -5,7 +5,7 @@ This is a Train Scheduler.
 ### How does it works
 *There is two functionalities in this app:
 
-    1. Informations relative to trains already present in the database are displayed; for each train, 2 types of information are displayed:
+    1. Informations relative to trains already presents in the database are displayed; for each train, 2 types of information are displayed:
         - the name, destination and frequency of the train
         - based to the first train time and the current time, the next train time and the time remaining before teh next trainn are calculated and displayed
 
